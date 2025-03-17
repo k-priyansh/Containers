@@ -1,0 +1,20 @@
+### build the image
+
+```bash
+docker build -t kali-custom .
+```
+
+```bash
+docker run -it --name kali-custom01 kali-custom
+```
+
+### How to upload the image to docker hub
+docker login
+docker tag <image-name> <username>/<image-name>:<version>
+docker tag <image-name> <username>/<image-name>:<version>
+
+> upload the image
+docker push <username>/<image-name>:v1
+
+> Example
+docker pull cyberuser/kali-nmap:v1  # To test

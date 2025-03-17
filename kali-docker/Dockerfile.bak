@@ -1,0 +1,101 @@
+# Use Kali Linux as the base image
+FROM kalilinux/kali-rolling
+
+# Set metadata (optional)
+LABEL maintainer="Your Name <your.email@example.com>"
+
+# Set non-interactive mode to avoid prompts during build
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update package list, upgrade existing packages, and install necessary tools
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y \
+    net-tools \
+    iputils-ping \
+    wget \
+    curl \
+    nano \
+    zsh \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    jq \
+    ruby-full \
+    libxml2 \
+    libxml2-dev \
+    libxslt1-dev \
+    ruby-dev \
+    build-essential \
+    libgmp-dev \
+    zlib1g-dev \
+    libffi-dev \
+    python-dev \
+    python-setuptools \
+    libldns-dev \
+    python3-pip \
+    python-pip \
+    python-dnspython \
+    git \
+    rename \
+    xargs \
+    chromium \
+    nmap \
+    awscli \
+    pipx \
+    metasploit-framework \
+    sqlmap \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Clone necessary repositories for tools
+RUN git clone https://github.com/nahamsec/recon_profile.git /root/recon_profile && \
+    cd /root/recon_profile && \
+    cat bash_profile >> ~/.bash_profile && \
+    source ~/.bash_profile && \
+    cd /root && \
+    mkdir /root/tools
+
+# Install GoLang
+RUN wget https://dl.google.com/go/go1.13.4.linux-amd64.tar.gz && \
+    tar -xvf go1.13.4.linux-amd64.tar.gz && \
+    mv go /usr/local && \
+    echo 'export GOROOT=/usr/local/go' >> ~/.bash_profile && \
+    echo 'export GOPATH=$HOME/go' >> ~/.bash_profile && \
+    echo 'export PATH=$GOPATH/bin:$GOROOT/bin:$PATH' >> ~/.bash_profile && \
+    source ~/.bash_profile
+
+# Install Aquatone and other tools
+RUN go get github.com/michenriksen/aquatone && \
+    git clone https://github.com/aboul3la/Sublist3r.git /root/tools/Sublist3r && \
+    cd /root/tools/Sublist3r && \
+    pipx install -r requirements.txt && \
+    git clone https://github.com/tomdev/teh_s3_bucketeers.git /root/tools/teh_s3_bucketeers && \
+    git clone https://github.com/wpscanteam/wpscan.git /root/tools/wpscan && \
+    cd /root/tools/wpscan && \
+    gem install bundler && bundle install --without test && \
+    git clone https://github.com/maurosoria/dirsearch.git /root/tools/dirsearch && \
+    git clone https://github.com/nahamsec/lazys3.git /root/tools/lazys3 && \
+    git clone https://github.com/jobertabma/virtual-host-discovery.git /root/tools/virtual-host-discovery && \
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git /root/tools/sqlmap-dev && \
+    git clone https://github.com/guelfoweb/knock.git /root/tools/knock && \
+    git clone https://github.com/nahamsec/lazyrecon.git /root/tools/lazyrecon && \
+    git clone https://github.com/blechschmidt/massdns.git /root/tools/massdns && \
+    cd /root/tools/massdns && make && \
+    git clone https://github.com/yassineaboukir/asnlookup.git /root/tools/asnlookup && \
+    pipx install -r /root/tools/asnlookup/requirements.txt && \
+    go get -u github.com/tomnomnom/httprobe && \
+    go get -u github.com/tomnomnom/unfurl && \
+    go get github.com/tomnomnom/waybackurls && \
+    git clone https://github.com/nahamsec/crtndstry.git /root/tools/crtndstry && \
+    git clone https://github.com/danielmiessler/SecLists.git /root/tools/SecLists && \
+    cd /root/tools/SecLists/Discovery/DNS/ && \
+    cat dns-Jhaddix.txt | head -n -14 > clean-jhaddix-dns.txt && \
+    echo "All tools installed."
+
+# Set working directory
+WORKDIR /root/tools
+
+# Expose necessary ports (optional, if you need to run services)
+# EXPOSE <port-number>
+
+# Command to start a shell (or replace with specific tool execution)
+CMD ["/bin/bash"]
+

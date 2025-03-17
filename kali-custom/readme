@@ -1,0 +1,9 @@
+### build the image
+
+```bash
+docker build -t kali-custom .
+```
+
+```bash
+docker run -it --name kali-custom01 kali-custom
+```
